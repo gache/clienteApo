@@ -18,61 +18,96 @@ import fr.bolsadeideas.springboot.backend.apirest.models.entity.Cliente;
 @RequestMapping("/api")
 public class ClienteRestController {
 
-	@Autowired
-	private IClienteService iClienteService;
+    @Autowired
+    private IClienteService iClienteService;
 
-	@GetMapping("/clientes")
-	public List<Cliente> index() {
-		return iClienteService.findAll();
-	}
+    @GetMapping("/clientes")
+    public List<Cliente> index() {
+        return iClienteService.findAll();
+    }
 
-	@GetMapping("clientes/{id}")
-	public ResponseEntity<?> show(@PathVariable Long id) {
+    @GetMapping("clientes/{id}")
+    public ResponseEntity<?> show(@PathVariable Long id) {
 
-		Cliente cliente = null;
-		Map<String, Object> response = new HashMap<String, Object>();
+        Cliente cliente = null;
+        Map<String, Object> response = new HashMap<String, Object>();
 
-		try {
+        try {
+            cliente = iClienteService.findByID(id);
+        } catch (DataAccessException e) {
+            response.put("mensaje", "Error al realizar la consulta en la base de datos");
+            response.put("error", e.getMessage().concat(": ".concat(e.getMostSpecificCause().getMessage())));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-			cliente = iClienteService.findByID(id);
+        if (cliente == null) {
+            response.put("mensaje", "El cliente ID: ".concat(id.toString().concat(" no existe en la base de datos !")));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<Cliente>(cliente, HttpStatus.OK);
+    }
 
-		} catch (DataAccessException e) {
+    @PostMapping("/clientes")
+    public ResponseEntity<?> create(@RequestBody Cliente cliente) {
+        Cliente clienteNew = null;
+        Map<String, Object> response = new HashMap<String, Object>();
+        try {
+            clienteNew = iClienteService.save(cliente);
+        } catch (DataAccessException e) {
+            response.put("mensaje", "Error al crear un cliente en la base de datos");
+            response.put("error", e.getMessage().concat(": ".concat(e.getMostSpecificCause().getMessage())));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.put("mensaje", "El cliente se ha creado con exito");
+        response.put("cliente", clienteNew);
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+    }
 
-			response.put("mensaje", "Error al realizar la consulta en la base de datos");
-			response.put("error", e.getMessage().concat(": ".concat(e.getMostSpecificCause().getMessage())));
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+    @PutMapping("/clientes/{id}")
+    public ResponseEntity<?> update(@RequestBody Cliente cliente, @PathVariable Long id) {
+        Cliente clientActual = iClienteService.findByID(id);
 
-		}
+        Cliente clienteUpdated = null;
 
-		if (cliente == null) {
-			response.put("mensaje", "El cliente ID: ".concat(id.toString().concat("no existe en la base de datos !")));
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
-		}
+        Map<String, Object> response = new HashMap<String, Object>();
 
-		return new ResponseEntity<Cliente>(cliente, HttpStatus.OK);
-	}
+        if (clientActual == null) {
+            response.put("mensaje", "Error: no se pudo editar, el cliente ID: ".concat(id.toString().concat(" no existe en la base de datos !")));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+        }
 
-	@PostMapping("/clientes")
-	@ResponseStatus(HttpStatus.CREATED)
-	public Cliente create(@RequestBody Cliente cliente) {
-		return iClienteService.save(cliente);
-	}
+        try {
+            clientActual.setNombre(cliente.getNombre());
+            clientActual.setApellido(cliente.getApellido());
+            clientActual.setEmail(cliente.getEmail());
+            clientActual.setCreateAt(cliente.getCreateAt());
+            clienteUpdated = iClienteService.save(clientActual);
+        } catch (DataAccessException e) {
+            response.put("mensaje", "Error al actualizar el cliente en la base de datos");
+            response.put("error", e.getMessage().concat(": ".concat(e.getMostSpecificCause().getMessage())));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.put("mensaje", "El cliente ha sido actualizado con exito");
+        response.put("cliente", clienteUpdated);
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 
-	@PutMapping("/clientes/{id}")
-	@ResponseStatus(HttpStatus.CREATED)
-	public Cliente update(@RequestBody Cliente cliente, @PathVariable Long id) {
-		Cliente currentCliente = this.iClienteService.findByID(id);
-		currentCliente.setNombre(cliente.getNombre());
-		currentCliente.setApellido(cliente.getApellido());
-		currentCliente.setEmail(cliente.getEmail());
-		this.iClienteService.save(currentCliente);
-		return currentCliente;
-	}
+    }
 
-	@DeleteMapping("/clientes/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable Long id) {
-		iClienteService.delete(id);
-	}
+    @DeleteMapping("/clientes/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<String, Object>();
+
+        try {
+            iClienteService.delete(id);
+        } catch (DataAccessException e) {
+            response.put("mensaje", "Error al eliminar el cliente en la base de datos");
+            response.put("error", e.getMessage().concat(": ".concat(e.getMostSpecificCause().getMessage())));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        response.put("mensaje", "El cliente ha sido actualizado con exito");
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+
+    }
 
 }
