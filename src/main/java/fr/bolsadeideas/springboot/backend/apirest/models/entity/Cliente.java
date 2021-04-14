@@ -4,75 +4,73 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.annotation.Generated;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "clientes")
 public class Cliente implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String nombre;
-	private String apellido;
-	private String email;
-	
-	@Column(name = "create_at")
-	@Temporal(TemporalType.DATE)
-	private Date createAt;
 
-	public Long getId() {
-		return id;
-	}
+    private String nombre;
+    private String apellido;
+    private String email;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Column(name = "create_at")
+    @Temporal(TemporalType.DATE)
+    private Date createAt;
 
-	public String getNombre() {
-		return nombre;
-	}
+    @PrePersist
+    public void prePresist() {
+        createAt = new Date();
+    }
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getApellido() {
-		return apellido;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setApellido(String apellido) {
-		this.apellido = apellido;
-	}
+    public String getNombre() {
+        return nombre;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getApellido() {
+        return apellido;
+    }
 
-	public Date getCreateAt() {
-		return createAt;
-	}
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
 
-	public void setCreateAt(Date createAt) {
-		this.createAt = createAt;
-	}
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Date getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(Date createAt) {
+        this.createAt = createAt;
+    }
 
 }
