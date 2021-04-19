@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.bolsadeideas.springboot.backend.apirest.models.dao.IUsuarioDao;
 import fr.bolsadeideas.springboot.backend.apirest.models.entity.Usuario;
@@ -26,12 +27,12 @@ public class UsuarioService implements IUsuarioService, UserDetailsService {
 	private IUsuarioDao usuarioDao;
 
 	@Override
+	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
 		Usuario usuario = usuarioDao.findByUsername(username);
 
 		if (usuario == null) {
-
 			logger.error("Error en el login: no existe el usuario '" + username + "' en el sistema!");
 			throw new UsernameNotFoundException(
 					"Error en el login: no existe el usuario '" + username + "' en el sistema!");
@@ -46,6 +47,7 @@ public class UsuarioService implements IUsuarioService, UserDetailsService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Usuario findByUsername(String username) {
 		return usuarioDao.findByUsername(username);
 	}

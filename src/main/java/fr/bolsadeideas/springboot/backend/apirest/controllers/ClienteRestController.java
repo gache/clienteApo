@@ -65,7 +65,7 @@ public class ClienteRestController {
 		Map<String, Object> response = new HashMap<String, Object>();
 
 		try {
-			cliente = iClienteService.findByID(id);
+			cliente = iClienteService.findById(id);
 		} catch (DataAccessException e) {
 			response.put("mensaje", "Error al realizar la consulta en la base de datos");
 			response.put("error", e.getMessage().concat(": ".concat(e.getMostSpecificCause().getMessage())));
@@ -110,7 +110,7 @@ public class ClienteRestController {
 
 	@PutMapping("/clientes/{id}")
 	public ResponseEntity<?> update(@Valid @RequestBody Cliente cliente, BindingResult result, @PathVariable Long id) {
-		Cliente clientActual = iClienteService.findByID(id);
+		Cliente clientActual = iClienteService.findById(id);
 
 		Cliente clienteUpdated = null;
 
@@ -156,7 +156,7 @@ public class ClienteRestController {
 		Map<String, Object> response = new HashMap<String, Object>();
 
 		try {
-			Cliente cliente = iClienteService.findByID(id);
+			Cliente cliente = iClienteService.findById(id);
 			String nombreFotoAnterior = cliente.getFoto();
 
 			iUploadFileService.eliminar(nombreFotoAnterior);
@@ -177,7 +177,7 @@ public class ClienteRestController {
 	public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id) {
 		Map<String, Object> response = new HashMap<String, Object>();
 
-		Cliente cliente = iClienteService.findByID(id);
+		Cliente cliente = iClienteService.findById(id);
 
 		if (!archivo.isEmpty()) {
 

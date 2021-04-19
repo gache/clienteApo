@@ -2,10 +2,8 @@ package fr.bolsadeideas.springboot.backend.apirest.models.dao;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 import fr.bolsadeideas.springboot.backend.apirest.models.entity.Usuario;
-
 
 public interface IUsuarioDao extends CrudRepository<Usuario, Long> {
 
